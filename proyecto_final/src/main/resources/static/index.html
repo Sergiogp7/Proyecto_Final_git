@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GymCore - Iniciar Sesión</title>
+    <link rel="stylesheet" href="Estilos/estilos.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="bg-white">
+    <div class="min-h-screen flex">
+      <!-- Left side - Form -->
+      <div
+        class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-white to-orange-50/30"
+      >
+        <div class="w-full max-w-md space-y-8 animate-in fade-in duration-500">
+          <!-- Logo -->
+          <div class="flex items-center gap-3">
+            <div
+              class="bg-gradient-to-br from-orange-500 to-orange-600 p-3 rounded-2xl shadow-lg shadow-orange-500/20"
+            >
+              <i data-lucide="dumbbell" class="w-8 h-8 text-white"></i>
+            </div>
+            <div>
+              <span
+                class="block text-3xl tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent font-bold"
+              >
+                GymCore
+              </span>
+              <span
+                class="block text-xs text-gray-500 tracking-wide font-medium"
+                >ELITE FITNESS</span
+              >
+            </div>
+          </div>
+
+          <!-- Title -->
+          <div class="space-y-3">
+            <h1
+              class="text-5xl tracking-tight bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent font-medium"
+            >
+              ¡Bienvenido de nuevo!
+            </h1>
+            <p class="text-gray-600 text-lg leading-relaxed">
+              Inicia sesión para continuar con tu entrenamiento
+            </p>
+          </div>
+
+          <!-- Form -->
+          <div class="space-y-5">
+            <div class="space-y-2">
+              <label for="email" class="text-gray-700 font-medium">Email</label>
+              <div class="relative">
+                <i
+                  data-lucide="mail"
+                  class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                ></i>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="tu@email.com"
+                  class="w-full h-14 pl-12 border border-gray-200 rounded-md bg-white shadow-sm hover:border-orange-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all outline-none"
+                />
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label for="password" class="text-gray-700 font-medium"
+                >Contraseña</label
+              >
+              <div class="relative">
+                <i
+                  data-lucide="lock"
+                  class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                ></i>
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  class="w-full h-14 pl-12 border border-gray-200 rounded-md bg-white shadow-sm hover:border-orange-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all outline-none"
+                />
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2">
+              <label
+                class="flex items-center gap-2 cursor-pointer group select-none"
+              >
+                <div class="relative">
+                  <input type="checkbox" class="peer sr-only" />
+                  <div
+                    class="w-5 h-5 border-2 border-gray-300 rounded peer-checked:bg-orange-500 peer-checked:border-orange-500 transition-all"
+                  ></div>
+                  <i
+                    data-lucide="check-circle-2"
+                    class="absolute inset-0 w-5 h-5 text-white opacity-0 peer-checked:opacity-100 transition-opacity"
+                  ></i>
+                </div>
+                <span
+                  class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors"
+                  >Recordarme</span
+                >
+              </label>
+              <span
+                class="text-sm bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent cursor-pointer hover:from-orange-700 hover:to-orange-600 transition-all font-medium"
+              >
+                ¿Olvidaste tu contraseña?
+              </span>
+            </div>
+
+            <button
+              id="loginBtn"
+              class="w-full h-14 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-md shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 transition-all duration-300 text-base font-medium flex items-center justify-center"
+            >
+              Iniciar sesión
+            </button>
+
+            <div class="text-center">
+              <span class="text-sm text-gray-600">
+                ¿No tienes cuenta?
+                <span
+                  class="bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent cursor-pointer hover:from-orange-700 hover:to-orange-600 transition-all font-medium"
+                >
+                  Regístrate gratis
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Social login -->
+          <div class="relative">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-gray-200"></div>
+            </div>
+            <div class="relative flex justify-center">
+              <span class="px-4 bg-white text-sm text-gray-500"
+                >O continúa con</span
+              >
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <button
+              class="h-12 border border-gray-200 rounded-md hover:border-gray-300 hover:bg-gray-50 transition-all shadow-sm flex items-center justify-center gap-2 font-medium bg-white text-gray-900"
+            >
+              <svg class="w-5 h-5" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                />
+              </svg>
+              Google
+            </button>
+            <button
+              class="h-12 border border-gray-200 rounded-md hover:border-gray-300 hover:bg-gray-50 transition-all shadow-sm flex items-center justify-center gap-2 font-medium bg-white text-gray-900"
+            >
+              <svg class="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24">
+                <path
+                  d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+                />
+              </svg>
+              Facebook
+            </button>
+          </div>
+
+          <!-- Trust Indicators -->
+          <div
+            class="flex items-center justify-center gap-6 pt-4 text-xs text-gray-500"
+          >
+            <div class="flex items-center gap-1">
+              <i
+                data-lucide="check-circle-2"
+                class="w-4 h-4 text-green-500"
+              ></i>
+              <span>Seguro</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <i
+                data-lucide="check-circle-2"
+                class="w-4 h-4 text-green-500"
+              ></i>
+              <span>Encriptado</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <i
+                data-lucide="check-circle-2"
+                class="w-4 h-4 text-green-500"
+              ></i>
+              <span>Privado</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right side - Image -->
+      <div
+        class="hidden lg:block lg:w-1/2 bg-cover bg-center relative"
+        style="
+          background-image: url(&quot;https://images.unsplash.com/photo-1756115484694-009466dbaa67?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxneW0lMjB3b3Jrb3V0JTIwZml0bmVzc3xlbnwxfHx8fDE3NjIwNjY2ODN8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral&quot;);
+        "
+      >
+        <div
+          class="absolute inset-0 bg-gradient-to-br from-black/60 via-black/50 to-orange-900/40 flex items-center justify-center p-12"
+        >
+          <div
+            class="text-white text-center max-w-lg space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700"
+          >
+            <div class="space-y-4">
+              <h2 class="text-6xl tracking-tight font-medium">
+                Transforma tu cuerpo y tu mente
+              </h2>
+              <div
+                class="h-1 w-24 bg-gradient-to-r from-orange-500 to-orange-400 mx-auto rounded-full"
+              ></div>
+            </div>
+            <p class="text-xl text-white/90 leading-relaxed font-normal">
+              Únete a miles de atletas que ya entrenan con GymCore
+            </p>
+            <div class="flex items-center justify-center gap-12 pt-4">
+              <div>
+                <div class="text-4xl font-semibold">50+</div>
+                <div class="text-sm text-white/70 mt-1">Gimnasios</div>
+              </div>
+              <div>
+                <div class="text-4xl font-semibold">100K+</div>
+                <div class="text-sm text-white/70 mt-1">Miembros</div>
+              </div>
+              <div>
+                <div class="text-4xl font-semibold">24/7</div>
+                <div class="text-sm text-white/70 mt-1">Acceso</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/Funcionalidad/global.js"></script>
+    <script src="/Funcionalidad/login.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>
