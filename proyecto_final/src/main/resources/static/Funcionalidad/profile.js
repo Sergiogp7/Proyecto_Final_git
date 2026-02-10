@@ -62,40 +62,74 @@ function configurarOyentesPerfil() {
             accionesGuardar.classList.add('hidden');
         };
 
-        formulario.onsubmit = (e) => {
+        formulario.onsubmit = async (e) => {
             e.preventDefault();
 
-            const usuarioActualizado = {
+            const usuarioActual = JSON.parse(localStorage.getItem('gymCoreUser'));
+            // Necesitamos el ID o email del usuario para saber a quién actualizar. 
+            // Asumiremos que el email es la clave única o que el backend lo busca por email.
+
+            const datosActualizados = {
                 nombre: document.getElementById('inputName').value,
                 nombreUsuario: document.getElementById('inputUsername').value,
                 email: document.getElementById('inputEmail').value,
                 telefono: document.getElementById('inputPhone').value,
                 ubicacion: document.getElementById('inputLocation').value,
                 bio: document.getElementById('inputBio').value,
-                avatar: JSON.parse(localStorage.getItem('gymCoreUser')).avatar || '../Imagenes/Foto_Perfil.jpg'
+                avatarUrl: usuarioActual.avatar || '../Imagenes/Foto_Perfil.jpg' // Mantener avatar
             };
 
-            localStorage.setItem('gymCoreUser', JSON.stringify(usuarioActualizado));
+            try {
+                const respuesta = await fetch('/api/auth/update-profile', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datosActualizados)
+                });
 
-            const sbNombre = document.getElementById('sidebarName');
-            const sbHandle = document.getElementById('sidebarHandle');
-            if (sbNombre) sbNombre.innerText = usuarioActualizado.nombre;
-            if (sbHandle) sbHandle.innerText = '@' + usuarioActualizado.nombreUsuario;
+                if (respuesta.ok) {
+                    const usuarioBD = await respuesta.json(); // Backend debería devolver el usuario actualizado
 
-            entradas.forEach(entrada => {
-                entrada.disabled = true;
-                entrada.classList.add('disabled:bg-gray-50');
-            });
+                    const usuarioNuevoLocal = {
+                        nombre: usuarioBD.nombre,
+                        nombreUsuario: usuarioBD.username,
+                        email: usuarioBD.email,
+                        telefono: usuarioBD.telefono || '',
+                        ubicacion: usuarioBD.ubicacion || '',
+                        bio: usuarioBD.bio || '',
+                        avatar: usuarioBD.avatarUrl
+                    };
 
-            btnEditar.classList.remove('hidden');
-            accionesGuardar.classList.add('hidden');
+                    localStorage.setItem('gymCoreUser', JSON.stringify(usuarioNuevoLocal));
 
-            const toast = document.getElementById('profileToast');
-            if (toast) {
-                toast.classList.remove('translate-y-20', 'opacity-0');
-                setTimeout(() => {
-                    toast.classList.add('translate-y-20', 'opacity-0');
-                }, 3000);
+                    // Actualizar UI Sidebar
+                    const sbNombre = document.getElementById('sidebarName');
+                    const sbHandle = document.getElementById('sidebarHandle');
+                    if (sbNombre) sbNombre.innerText = usuarioNuevoLocal.nombre;
+                    if (sbHandle) sbHandle.innerText = '@' + usuarioNuevoLocal.nombreUsuario;
+
+                    // Deshabilitar inputs
+                    entradas.forEach(entrada => {
+                        entrada.disabled = true;
+                        entrada.classList.add('disabled:bg-gray-50');
+                    });
+
+                    btnEditar.classList.remove('hidden');
+                    accionesGuardar.classList.add('hidden');
+
+                    const toast = document.getElementById('profileToast');
+                    if (toast) {
+                        toast.classList.remove('translate-y-20', 'opacity-0');
+                        setTimeout(() => {
+                            toast.classList.add('translate-y-20', 'opacity-0');
+                        }, 3000);
+                    }
+                } else {
+                    const error = await respuesta.text();
+                    alert('Error al actualizar perfil: ' + error);
+                }
+            } catch (error) {
+                console.error('Error al actualizar:', error);
+                alert('Error de conexión al actualizar el perfil.');
             }
         };
     }

@@ -1,16 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const btnInicioSesion = document.getElementById('RegistroBtn');
-    if (btnInicioSesion) {
-        btnInicioSesion.addEventListener('click', async (e) => {
+    const btnRegistro = document.getElementById('RegistroBtn');
+    if (btnRegistro) {
+        btnRegistro.addEventListener('click', async (e) => {
             e.preventDefault();
-            const correo = document.getElementById('email').value;
-            const contrasena = document.getElementById('password').value;
+
+            const nombre = document.getElementById('nombre').value;
+            const apellidos = document.getElementById('apellidos').value;
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!nombre || !apellidos || !username || !email || !password) {
+                alert('Por favor completa todos los campos');
+                return;
+            }
 
             try {
-                const respuesta = await fetch('/api/auth/login', {
+                const respuesta = await fetch('/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: correo, password: contrasena })
+                    body: JSON.stringify({
+                        nombre: nombre,
+                        apellidos: apellidos,
+                        username: username,
+                        email: email,
+                        password: password
+                    })
                 });
 
                 if (respuesta.ok) {
@@ -27,12 +42,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     };
 
                     localStorage.setItem('gymCoreUser', JSON.stringify(usuario));
+                    // Redirigir al login o directamente al home? El usuario pidió "modelo parecido al login"
+                    // que redirige a Home.
                     window.location.href = 'Estructura/Home.html';
                 } else {
-                    alert('Credenciales incorrectas. Verifica tu correo y contraseña.');
+                    const textoError = await respuesta.text();
+                    alert('Error en el registro: ' + (textoError || 'Datos inválidos o usuario ya existente.'));
                 }
             } catch (error) {
-                console.error('Error de login:', error);
+                console.error('Error de registro:', error);
                 alert('Error al conectar con el servidor.');
             }
         });

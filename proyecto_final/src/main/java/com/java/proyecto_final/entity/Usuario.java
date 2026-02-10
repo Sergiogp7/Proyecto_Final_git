@@ -1,7 +1,14 @@
 package com.java.proyecto_final.entity;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "USUARIOS")
@@ -14,6 +21,9 @@ public class Usuario {
 
     @Column(nullable = false)
     private String nombre;
+
+    @Column(nullable = false)
+    private String apellidos;
 
     @Column(unique = true)
     private String username;
@@ -45,6 +55,9 @@ public class Usuario {
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
+
+    public String getApellidos() { return apellidos; }
+    public void setApellidos(String apellidos) { this.apellidos = apellidos; }
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
