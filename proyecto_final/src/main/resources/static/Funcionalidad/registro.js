@@ -24,27 +24,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         apellidos: apellidos,
                         username: username,
                         email: email,
-                        password: password
+                        contrasena: password
                     })
                 });
 
                 if (respuesta.ok) {
                     const usuarioBD = await respuesta.json();
 
-                    const usuario = {
-                        nombre: usuarioBD.nombre,
-                        nombreUsuario: usuarioBD.username,
-                        email: usuarioBD.email,
-                        telefono: usuarioBD.telefono || '',
-                        ubicacion: usuarioBD.ubicacion || '',
-                        bio: usuarioBD.bio || '',
-                        avatar: usuarioBD.avatarUrl || '../Imagenes/Foto_Perfil.jpg'
-                    };
-
-                    localStorage.setItem('gymCoreUser', JSON.stringify(usuario));
-                    // Redirigir al login o directamente al home? El usuario pidió "modelo parecido al login"
-                    // que redirige a Home.
-                    window.location.href = 'Estructura/Home.html';
+                    localStorage.setItem('gymCoreUser', JSON.stringify(usuarioBD));
+                    window.location.href = '/Estructura/Home.html';
                 } else {
                     const textoError = await respuesta.text();
                     alert('Error en el registro: ' + (textoError || 'Datos inválidos o usuario ya existente.'));

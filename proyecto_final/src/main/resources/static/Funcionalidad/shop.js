@@ -1,113 +1,88 @@
-let categoriaActual = 'all';
-let busquedaActual = '';
+let filtroCategoria = 'all';
+let filtroBusqueda = '';
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('productsGrid')) {
-        renderizarTienda();
-        configurarOyentesTienda();
+    if (document.getElementById('productList')) {
+        cargarProductos();
+        configurarFiltros();
     }
 });
 
-async function renderizarTienda() {
-    const cuadricula = document.getElementById('productsGrid');
-    if (!cuadricula) return;
-
-    if (productos.length === 0) {
-        try {
-            const respuesta = await fetch('/api/products');
-            if (respuesta.ok) {
-                productos = await respuesta.json();
-
-                productos = productos.map(p => ({
-                    ...p,
-                    id: p.id,
-                    name: p.nombre,
-                    category: p.categoria,
-                    reviews: p.reviewsCount,
-                    image: p.imagenUrl,
-                    oldPrice: p.precioAnterior,
-                    price: p.precio
-                }));
-            }
-        } catch (error) {
-            console.error('Error fetching products:', error);
-            cuadricula.innerHTML = '<p class="text-red-500 text-center col-span-3">Error al cargar productos.</p>';
-            return;
+async function cargarProductos() {
+    try {
+        const respuesta = await fetch('/api/products');
+        if (respuesta.ok) {
+            productos = await respuesta.json();
+            renderizarProductos();
         }
+    } catch (error) {
+        console.error('Error:', error);
     }
-
-    cuadricula.innerHTML = '';
-
-    const filtrados = productos.filter(p => {
-        const coincideCategoria = categoriaActual === 'all' || p.category === categoriaActual;
-        const coincideBusqueda = p.name.toLowerCase().includes(busquedaActual.toLowerCase());
-        return coincideCategoria && coincideBusqueda;
-    });
-
-    filtrados.forEach(p => {
-        const tarjeta = document.createElement('div');
-        tarjeta.className = "rounded-xl border bg-card text-card-foreground shadow overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border-gray-200 group bg-white fade-in";
-        tarjeta.innerHTML = `
-            <div class="relative h-72 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
-                <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                ${p.badge ? `<div class="absolute top-4 left-4 shadow-lg inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-gradient-to-r from-${p.badgeColor === 'green' ? 'green-500 to-green-600' : p.badgeColor === 'blue' ? 'blue-500 to-blue-600' : 'orange-500 to-orange-600'} text-white border-0">${p.badge}</div>` : ''}
-                ${p.oldPrice ? `<div class="absolute top-4 right-4 bg-red-500 text-white border-0 shadow-lg inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">-${Math.round((1 - p.price / p.oldPrice) * 100)}%</div>` : ''}
-            </div>
-            <div class="p-5 space-y-4">
-                <div>
-                    <h3 class="text-lg mb-2 line-clamp-2 group-hover:text-orange-600 transition-colors font-semibold">${p.name}</h3>
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="star" class="w-4 h-4 fill-orange-400 text-orange-400"></i>
-                        <span class="text-sm text-gray-600">${p.rating}</span>
-                        <span class="text-sm text-gray-400">(${p.reviews})</span>
-                    </div>
-                </div>
-                <div class="space-y-1">
-                    <div class="flex items-baseline gap-2">
-                        <span class="text-3xl bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent font-bold">€${p.price}</span>
-                        ${p.oldPrice ? `<span class="text-sm text-gray-400 line-through">€${p.oldPrice}</span>` : ''}
-                    </div>
-                </div>
-                <button onclick="agregarAlCarrito(${p.id})" class="w-full h-11 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-md shadow-orange-500/20 group-hover:shadow-lg group-hover:shadow-orange-500/30 transition-all duration-300 rounded-md text-white font-medium flex items-center justify-center">
-                    <i data-lucide="shopping-cart" class="w-4 h-4 mr-2"></i> Añadir al carrito
-                </button>
-            </div>
-        `;
-        cuadricula.appendChild(tarjeta);
-    });
-    inicializarIconos();
 }
 
-function configurarOyentesTienda() {
-    const entradaBusqueda = document.getElementById('searchInput');
-    if (entradaBusqueda) {
-        entradaBusqueda.addEventListener('input', (e) => {
-            busquedaActual = e.target.value;
-            renderizarTienda();
-        });
-    }
-
-    const pestanas = document.querySelectorAll('[data-tab-category]');
-    pestanas.forEach(pestana => {
-        pestana.addEventListener('click', () => {
-            pestanas.forEach(t => {
-                t.classList.remove('bg-gradient-to-r', 'from-orange-500', 'to-orange-600', 'text-white', 'shadow-md');
-                t.classList.add('bg-white', 'text-gray-900', 'hover:text-gray-900');
-                if (t !== pestana) t.classList.replace('text-gray-900', 'text-gray-500');
-            });
-
-            pestana.classList.remove('bg-white', 'text-gray-900', 'text-gray-500');
-            pestana.classList.add('bg-gradient-to-r', 'from-orange-500', 'to-orange-600', 'text-white', 'shadow-md');
-
-            categoriaActual = pestana.getAttribute('data-tab-category');
-            renderizarTienda();
+function configurarFiltros() {
+    const tabs = document.querySelectorAll('.category-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('bg-gray-900', 'text-white'));
+            tab.classList.add('bg-gray-900', 'text-white');
+            filtroCategoria = tab.getAttribute('data-category');
+            renderizarProductos();
         });
     });
 
-    const pestanaTodas = document.querySelector('[data-tab-category="all"]');
-    if (pestanaTodas) {
-        pestanaTodas.classList.remove('bg-white', 'text-gray-900');
-        pestanaTodas.classList.add('bg-gradient-to-r', 'from-orange-500', 'to-orange-600', 'text-white', 'shadow-md');
+    const buscador = document.getElementById('searchInput');
+    if (buscador) {
+        buscador.addEventListener('input', (e) => {
+            filtroBusqueda = e.target.value.toLowerCase();
+            renderizarProductos();
+        });
     }
+}
+
+function renderizarProductos() {
+    const lista = document.getElementById('productList');
+    if (!lista) return;
+
+    const filtrados = productos.filter(p => {
+        const coincideCat = filtroCategoria === 'all' || p.categoria === filtroCategoria;
+        const coincideBusq = p.nombre.toLowerCase().includes(filtroBusqueda);
+        return coincideCat && coincideBusq;
+    });
+
+    lista.innerHTML = filtrados.map(p => `
+        <div class="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-orange-500/5 transition-all duration-500">
+            <div class="relative aspect-square overflow-hidden bg-gray-50">
+                <img src="${p.imagenUrl}" alt="${p.nombre}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                ${p.badge ? `
+                <div class="absolute top-4 left-4">
+                    <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/90 backdrop-blur-sm text-${p.badgeColor}-600 border border-${p.badgeColor}-100 shadow-sm">
+                        ${p.badge}
+                    </span>
+                </div>` : ''}
+                <button onclick="agregarAlCarrito(${p.id})" class="absolute bottom-4 right-4 translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 w-12 h-12 rounded-xl bg-orange-500 text-white shadow-lg shadow-orange-500/30 flex items-center justify-center hover:bg-orange-600">
+                    <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center gap-1 mb-2">
+                    <div class="flex text-orange-400">
+                        <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gray-900">${p.rating || '5.0'}</span>
+                    <span class="text-xs text-gray-400">(${p.reviewsCount || '0'})</span>
+                </div>
+                <h3 class="font-bold text-gray-900 mb-2 line-clamp-1">${p.nombre}</h3>
+                <div class="flex items-center justify-between">
+                    <div class="flex flex-col">
+                        ${p.precioAnterior ? `<span class="text-xs text-gray-400 line-through">€${p.precioAnterior}</span>` : ''}
+                        <span class="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">€${p.precio}</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md">EN STOCK</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    inicializarIconos();
 }

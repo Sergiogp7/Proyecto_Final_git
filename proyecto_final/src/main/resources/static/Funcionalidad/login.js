@@ -1,39 +1,52 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const btnInicioSesion = document.getElementById('loginBtn');
-    if (btnInicioSesion) {
-        btnInicioSesion.addEventListener('click', async (e) => {
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const correo = document.getElementById('email').value;
-            const contrasena = document.getElementById('password').value;
+
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+
+            if (!emailInput || !passwordInput) return;
+
+            const credentials = {
+                email: emailInput.value,
+                password: passwordInput.value
+            };
+
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerText;
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Cargando...';
 
             try {
-                const respuesta = await fetch('/api/auth/login', {
+                const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: correo, password: contrasena })
+                    body: JSON.stringify(credentials)
                 });
 
-                if (respuesta.ok) {
-                    const usuarioBD = await respuesta.json();
-
-                    const usuario = {
-                        nombre: usuarioBD.nombre,
-                        nombreUsuario: usuarioBD.username,
-                        email: usuarioBD.email,
-                        telefono: usuarioBD.telefono || '',
-                        ubicacion: usuarioBD.ubicacion || '',
-                        bio: usuarioBD.bio || '',
-                        avatar: usuarioBD.avatarUrl || '../Imagenes/Foto_Perfil.jpg'
-                    };
-
-                    localStorage.setItem('gymCoreUser', JSON.stringify(usuario));
-                    window.location.href = 'Estructura/Home.html';
+                if (response.ok) {
+                    const user = await response.json();
+                    localStorage.setItem('gymCoreUser', JSON.stringify(user));
+                    window.location.href = '/Estructura/Home.html';
                 } else {
-                    alert('Credenciales incorrectas. Verifica tu correo y contraseña.');
+                    const errorText = document.getElementById('errorText');
+                    if (errorText) {
+                        errorText.innerText = 'Credenciales incorrectas. Pruebe otra vez.';
+                        errorText.classList.remove('hidden');
+                    }
                 }
             } catch (error) {
-                console.error('Error de login:', error);
-                alert('Error al conectar con el servidor.');
+                console.error('Error:', error);
+                const errorText = document.getElementById('errorText');
+                if (errorText) {
+                    errorText.innerText = 'Error de conexión con el servidor.';
+                    errorText.classList.remove('hidden');
+                }
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalText;
             }
         });
     }

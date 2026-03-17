@@ -43,8 +43,9 @@ public class Producto {
     private String badgeColor;
 
     private Integer stock;
+    @Column(columnDefinition = "TEXT")
+    private String descripcion;
 
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -77,4 +78,7 @@ public class Producto {
 
     public Integer getStock() { return stock; }
     public void setStock(Integer stock) { this.stock = stock; }
+
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 }

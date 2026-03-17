@@ -22,13 +22,12 @@ public class Usuario {
     @Column(nullable = false)
     private String nombre;
 
-    @Column(nullable = false)
     private String apellidos;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
     @Column(nullable = false)
@@ -36,8 +35,6 @@ public class Usuario {
 
     private String telefono;
     private String ubicacion;
-
-    @Column(columnDefinition = "TEXT")
     private String bio;
 
     @Column(name = "avatar_url")
@@ -49,7 +46,11 @@ public class Usuario {
     @Column(name = "fecha_registro")
     private LocalDateTime fechaRegistro;
 
-    // Explicit Getters and Setters
+    @PrePersist
+    protected void onCreate() {
+        fechaRegistro = LocalDateTime.now();
+    }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -84,10 +85,4 @@ public class Usuario {
     public void setEsAdmin(boolean esAdmin) { this.esAdmin = esAdmin; }
 
     public LocalDateTime getFechaRegistro() { return fechaRegistro; }
-    public void setFechaRegistro(LocalDateTime fechaRegistro) { this.fechaRegistro = fechaRegistro; }
-
-    @PrePersist
-    protected void onCreate() {
-        fechaRegistro = LocalDateTime.now();
-    }
 }

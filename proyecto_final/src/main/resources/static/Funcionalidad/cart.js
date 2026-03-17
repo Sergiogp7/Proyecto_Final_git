@@ -1,5 +1,3 @@
-// Funcionalidad/cart.js
-
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('cartItemsContainer')) {
         renderizarCarrito();
@@ -28,18 +26,19 @@ function renderizarCarrito() {
         let total = 0;
 
         articulosCarrito.forEach((item, index) => {
-            total += item.price;
+            const precio = parseFloat(item.precio || 0);
+            total += precio;
             const el = document.createElement('div');
             el.className = 'flex gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm items-center';
             el.innerHTML = `
                 <div class="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                    <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover">
+                    <img src="${item.imagenUrl}" alt="${item.nombre}" class="w-full h-full object-cover">
                 </div>
                 <div class="flex-1">
-                    <h3 class="font-medium text-lg leading-tight mb-1">${item.name}</h3>
-                    <p class="text-sm text-gray-500 mb-2">${item.category}</p>
+                    <h3 class="font-medium text-lg leading-tight mb-1">${item.nombre}</h3>
+                    <p class="text-sm text-gray-500 mb-2">${item.categoria}</p>
                     <div class="flex items-center justify-between">
-                        <span class="font-bold text-lg">€${item.price}</span>
+                        <span class="font-bold text-lg">€${precio.toFixed(2)}</span>
                         <button onclick="eliminarDelCarrito(${index})" class="text-red-500 hover:text-red-700 text-sm font-medium">Eliminar</button>
                     </div>
                 </div>
