@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GymCore - Comunidad</title>
     <link rel="stylesheet" href="../Estilos/estilos.css" />
+    <link rel="stylesheet" href="../Estilos/premium.css" />
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
       .scrollbar-hide::-webkit-scrollbar {
@@ -170,31 +171,32 @@
                     class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[100px] mb-4 border-gray-200 focus:border-orange-500 focus:ring-orange-500/20 resize-none outline-none"
                   ></textarea>
                   <div class="flex items-center justify-between">
-                    <div class="flex gap-2">
-                      <button
-                        onclick="gestionarNoImplementado('Subir foto')"
-                        class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium border bg-background h-9 px-3 border-gray-200 hover:bg-orange-50"
-                      >
-                        <i
-                          data-lucide="image"
-                          class="w-4 h-4 mr-2 text-orange-500"
-                        ></i>
-                        Foto
-                      </button>
-                      <button
-                        onclick="gestionarNoImplementado('Subir video')"
-                        class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium border bg-background h-9 px-3 border-gray-200 hover:bg-orange-50"
-                      >
-                        <i
-                          data-lucide="camera"
-                          class="w-4 h-4 mr-2 text-orange-500"
-                        ></i>
-                        Video
-                      </button>
+                    <div class="flex flex-col gap-2 w-full mr-4">
+                      <div class="flex gap-2">
+                        <button
+                          type="button"
+                          onclick="togglePhotoInput()"
+                          class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium border bg-background h-9 px-3 border-gray-200 hover:bg-orange-50 transition-colors"
+                        >
+                          <i
+                            data-lucide="image"
+                            class="w-4 h-4 mr-2 text-orange-500"
+                          ></i>
+                          Foto
+                        </button>
+                      </div>
+                      <div id="photoInputContainer" class="hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                        <input 
+                          type="text" 
+                          id="imageUrlInput" 
+                          placeholder="Pega la URL de tu imagen aquí..." 
+                          class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                      </div>
                     </div>
                     <button
                       id="publishBtn"
-                      class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white"
+                      class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-10 px-6 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/20 hover:shadow-lg hover:shadow-orange-500/30 transition-all active:scale-95"
                     >
                       Publicar
                     </button>

@@ -5,33 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GymCore - Tienda</title>
     <link rel="stylesheet" href="../Estilos/estilos.css" />
+    <link rel="stylesheet" href="../Estilos/premium.css" />
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-      .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-      }
-      .scrollbar-hide {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-      .fade-in {
-        animation: fadeIn 0.3s ease-in;
-      }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-    </style>
   </head>
   <body class="bg-gray-50">
     <nav
-      class="bg-white/80 backdrop-blur-lg border-b border-gray-200/80 sticky top-0 z-50 shadow-sm"
+      class="glass-nav sticky top-0 z-50 transition-all duration-300"
     >
       <div class="container mx-auto px-6">
         <div class="flex items-center justify-between h-20">

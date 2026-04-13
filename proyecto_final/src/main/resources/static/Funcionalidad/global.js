@@ -6,7 +6,7 @@ try {
     const guardado = localStorage.getItem('gymCoreCart');
     if (guardado) {
         articulosCarrito = JSON.parse(guardado);
-        contadorCarrito = articulosCarrito.length;
+        contadorCarrito = articulosCarrito.reduce((suma, item) => suma + (item.cantidad || 1), 0);
     }
 } catch (e) { }
 
@@ -103,17 +103,17 @@ function actualizarDropdownCarrito() {
             <div class="flex gap-3 p-4 hover:bg-gray-50 transition-colors border-b border-gray-50">
                 <img src="${item.imagenUrl}" class="w-12 h-12 rounded-lg object-cover">
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-bold text-gray-900 truncate">${item.nombre}</p>
+                    <p class="text-sm font-bold text-gray-900 truncate">${item.nombre} <span class="text-gray-500 font-normal">x${item.cantidad || 1}</span></p>
                     <p class="text-xs text-orange-600 font-medium">€${item.precio}</p>
                 </div>
             </div>
         `).join('');
 
-        const total = articulosCarrito.reduce((sum, item) => sum + (parseFloat(item.precio) || 0), 0);
+        const total = articulosCarrito.reduce((sum, item) => sum + (parseFloat(item.precio) || 0) * (item.cantidad || 1), 0);
 
         panel.innerHTML = `
             <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-orange-50/50">
-                <span class="font-bold text-gray-900">Carrito (${articulosCarrito.length})</span>
+                <span class="font-bold text-gray-900">Carrito (${contadorCarrito})</span>
                 <span class="text-xs font-bold text-orange-600">Total: €${total.toFixed(2)}</span>
             </div>
             <div class="max-h-60 overflow-y-auto">
@@ -132,7 +132,12 @@ function actualizarDropdownCarrito() {
 function agregarAlCarrito(idProducto) {
     const producto = productos.find(p => p.id === idProducto);
     if (producto) {
-        articulosCarrito.push(producto);
+        const itemExistente = articulosCarrito.find(item => item.id === idProducto);
+        if (itemExistente) {
+            itemExistente.cantidad = (itemExistente.cantidad || 1) + 1;
+        } else {
+            articulosCarrito.push({ ...producto, cantidad: 1 });
+        }
         contadorCarrito++;
         localStorage.setItem('gymCoreCart', JSON.stringify(articulosCarrito));
         actualizarInsigniaCarrito();
@@ -152,79 +157,147 @@ function gestionarBusquedaGlobal() {
     }
 }
 
-function gestionarNotificaciones() {
-    const badge = document.getElementById('notificationBadge');
-    if (badge) {
-        badge.classList.add('hidden');
+let notificaciones = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+    inicializarIconos();
+    configurarNavegacion();
+    actualizarInsigniaCarrito();
+    actualizarInsigniaNotificaciones();
+});
+
+async function actualizarInsigniaNotificaciones() {
+    const usuarioGuardado = localStorage.getItem('gymCoreUser');
+    if (!usuarioGuardado) return;
+    const u = JSON.parse(usuarioGuardado);
+
+    try {
+        const respuesta = await fetch(`/api/notificaciones/${u.username}`);
+        if (respuesta.ok) {
+            notificaciones = await respuesta.json();
+            const badge = document.getElementById('notificationBadge');
+            if (badge) {
+                const unreadCount = notificaciones.filter(n => !n.leida).length;
+                badge.innerText = unreadCount;
+                if (unreadCount > 0) {
+                    badge.classList.remove('hidden');
+                    badge.classList.add('flex');
+                } else {
+                    badge.classList.add('hidden');
+                    badge.classList.remove('flex');
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error cargando notificaciones:', error);
     }
+}
 
+function gestionarNotificaciones() {
     let panel = document.getElementById('notificationPanel');
-
     if (!panel) {
         panel = document.createElement('div');
         panel.id = 'notificationPanel';
-        panel.className = 'fixed top-20 right-6 w-96 bg-white/90 backdrop-blur-xl border border-gray-200/80 rounded-2xl shadow-2xl z-[60] overflow-hidden transition-all duration-300 translate-y-2 opacity-0 pointer-events-none scale-95 origin-top-right';
-        panel.innerHTML = `
-            <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-orange-50 to-transparent">
-                <h3 class="font-bold text-gray-900 flex items-center gap-2">
-                    <i data-lucide="bell" class="w-5 h-5 text-orange-500"></i>
-                    Notificaciones
-                </h3>
-                <span class="text-[10px] font-bold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full uppercase tracking-wider">3 Nuevas</span>
-            </div>
-            <div class="max-h-[400px] overflow-y-auto overflow-x-hidden scrollbar-hide py-2">
-                <div class="hover:bg-orange-50/50 p-4 transition-colors cursor-pointer flex gap-4 items-start group">
-                    <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 group-hover:scale-110 transition-transform">
-                        <i data-lucide="heart" class="w-5 h-5 fill-current"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-800"><span class="font-bold">@lau_fit</span> le ha gustado tu publicación</p>
-                        <p class="text-[10px] text-gray-400 mt-1">Hace 5 minutos</p>
-                    </div>
-                    <div class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
-                </div>
-                <div class="hover:bg-orange-50/50 p-4 transition-colors cursor-pointer flex gap-4 items-start group">
-                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
-                        <i data-lucide="message-circle" class="w-5 h-5"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-800"><span class="font-bold">Carlos Ruiz</span> ha comentado: <span class="italic text-gray-500">"¡Esa es la actitud, sigue así! 💪"</span></p>
-                        <p class="text-[10px] text-gray-400 mt-1">Hace 15 minutos</p>
-                    </div>
-                    <div class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
-                </div>
-                <div class="hover:bg-orange-50/50 p-4 transition-colors cursor-pointer flex gap-4 items-start group border-b border-gray-50">
-                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
-                        <i data-lucide="message-circle" class="w-5 h-5"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-800"><span class="font-bold">Ana Torroja</span> ha comentado: <span class="italic text-gray-500">"¡Vaya cambio! 🔥 Pasé por el gym y te vi entrenando duro."</span></p>
-                        <p class="text-[10px] text-gray-400 mt-1">Hace 1 hora</p>
-                    </div>
-                    <div class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
-                </div>
-            </div>
-            <div class="p-3 bg-gray-50 text-center border-t border-gray-100">
-                <button onclick="this.parentElement.parentElement.classList.add('pointer-events-none', 'opacity-0', 'scale-95', 'translate-y-2');" class="text-xs font-bold text-gray-500 hover:text-orange-600 transition-colors uppercase tracking-widest">Cerrar Notificaciones</button>
-            </div>
-        `;
+        panel.className = 'fixed top-20 right-6 w-96 bg-white/95 backdrop-blur-xl border border-gray-200/80 rounded-2xl shadow-2xl z-[60] overflow-hidden transition-all duration-300 translate-y-2 opacity-0 pointer-events-none scale-95 origin-top-right';
         document.body.appendChild(panel);
-        if (typeof lucide !== 'undefined') lucide.createIcons();
 
-        // Close when clicking outside
         document.addEventListener('click', (e) => {
-            const bell = document.querySelector('[onclick="gestionarNotificaciones()"]');
-            if (panel && !panel.contains(e.target) && !bell.contains(e.target)) {
+            if (panel && !panel.contains(e.target) && !e.target.closest('[onclick="gestionarNotificaciones()"]')) {
                 panel.classList.add('pointer-events-none', 'opacity-0', 'scale-95', 'translate-y-2');
             }
         });
     }
+
+    renderizarNotificaciones(panel);
 
     const isOpen = !panel.classList.contains('pointer-events-none');
     if (isOpen) {
         panel.classList.add('pointer-events-none', 'opacity-0', 'scale-95', 'translate-y-2');
     } else {
         panel.classList.remove('pointer-events-none', 'opacity-0', 'scale-95', 'translate-y-2');
+    }
+}
+
+function renderizarNotificaciones(panel) {
+    const unreadCount = notificaciones.filter(n => !n.leida).length;
+    
+    const itemsHTML = notificaciones.map(n => {
+        let color = 'bg-orange-100 text-orange-600';
+        let icono = 'bell';
+        if (n.tipo === 'like') { color = 'bg-orange-100 text-orange-600'; icono = 'heart'; }
+        else if (n.tipo === 'comment') { color = 'bg-blue-100 text-blue-600'; icono = 'message-circle'; }
+
+        return `
+            <div onclick="marcarComoLeida(${n.id})" class="hover:bg-orange-50/50 p-4 transition-colors cursor-pointer flex gap-4 items-start group ${n.leida ? 'opacity-60' : ''}">
+                <div class="w-10 h-10 rounded-full ${color} flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+                    <i data-lucide="${icono}" class="w-5 h-5 ${icono === 'heart' ? 'fill-current' : ''}"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm text-gray-800">${n.mensaje}</p>
+                    <p class="text-[10px] text-gray-400 mt-1">Recientemente</p>
+                </div>
+                ${!n.leida ? '<div class="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-sm shadow-orange-500/40 animate-pulse mt-2"></div>' : ''}
+            </div>
+        `;
+    }).join('');
+
+    panel.innerHTML = `
+        <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-orange-50 to-transparent">
+            <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                <i data-lucide="bell" class="w-5 h-5 text-orange-500"></i>
+                Notificaciones
+            </h3>
+            ${unreadCount > 0 ? `<span class="text-[10px] font-bold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full uppercase tracking-wider">${unreadCount} Nuevas</span>` : ''}
+        </div>
+        <div class="max-h-[400px] overflow-y-auto overflow-x-hidden scrollbar-hide py-2">
+            ${notificaciones.length > 0 ? itemsHTML : `
+                <div class="text-center py-12">
+                    <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="bell-off" class="w-8 h-8 text-gray-300"></i>
+                    </div>
+                    <p class="text-gray-500 font-medium text-base">No hay notificaciones</p>
+                    <p class="text-xs text-gray-400 mt-1">Estás al día con todo.</p>
+                </div>
+            `}
+        </div>
+        <div class="p-4 bg-gray-50/50 border-t border-gray-100 flex gap-2">
+            <button onclick="marcarTodasLeidas()" class="flex-1 text-[10px] font-bold py-2 rounded-lg border border-gray-200 hover:bg-white transition-all uppercase tracking-widest text-gray-500 hover:text-orange-600">Leídas</button>
+            <button onclick="document.getElementById('notificationPanel').classList.add('pointer-events-none', 'opacity-0', 'scale-95', 'translate-y-2');" class="flex-1 text-[10px] font-bold py-2 rounded-lg bg-white border border-gray-200 hover:border-orange-200 transition-all uppercase tracking-widest text-gray-400">Cerrar</button>
+        </div>
+    `;
+    
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+async function marcarComoLeida(id) {
+    try {
+        const response = await fetch(`/api/notificaciones/leer/${id}`, { method: 'POST' });
+        if (response.ok) {
+            actualizarInsigniaNotificaciones().then(() => {
+                const panel = document.getElementById('notificationPanel');
+                if (panel) renderizarNotificaciones(panel);
+            });
+        }
+    } catch (error) {
+        console.error('Error marcando notificación:', error);
+    }
+}
+
+async function marcarTodasLeidas() {
+    const usuarioGuardado = localStorage.getItem('gymCoreUser');
+    if (!usuarioGuardado) return;
+    const u = JSON.parse(usuarioGuardado);
+
+    try {
+        const response = await fetch(`/api/notificaciones/leer-todas/${u.username}`, { method: 'POST' });
+        if (response.ok) {
+            actualizarInsigniaNotificaciones().then(() => {
+                const panel = document.getElementById('notificationPanel');
+                if (panel) renderizarNotificaciones(panel);
+            });
+        }
+    } catch (error) {
+        console.error('Error marcando todas las notificaciones:', error);
     }
 }
 
